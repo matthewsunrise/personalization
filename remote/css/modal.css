@@ -1618,7 +1618,21 @@ input[type="submit"].button {
     display: flex;
 }
 
+#personalizationImage {
+    position:relative;
+    display:flex;
+    justify-content: center;
+}
+
 .text-zone {
     background-color:transparent;
     position:absolute;
+    width:10px;
+    height:10px;
+    left:0;
+    top:0;
+    border:1px dashed #ccc;
+    overflow:hidden;
+    white-space: nowrap;
 }
+

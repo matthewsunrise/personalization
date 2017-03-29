@@ -3,8 +3,6 @@ header('Content-type: application/json');
 ini_set('error_reporting', E_ALL);
 ini_set('display_errors', 1);
 
-
-
 $appName = 'teelaunch';
 
 $appPath = $_SERVER['DOCUMENT_ROOT'] . '/a/' . $appName . '/';
@@ -38,19 +36,13 @@ $shopifyAPI->api_url = $shop;
 
 if($action == 'getProduct') {
     $product_id = $_GET['product_id'];
-    $metafields = $shopifyAPI->getProductMetadata($product_id);
-    $metafields = $metafields->metafields;
 
-    $personalization = array();
+	$query = "SELECT * FROM teelaunch_personalization WHERE product_id = :product_id";
 
-    foreach($metafields as $field) {
-        if($field->key == 'personalization_details') {
-            $personalization = $field->value;
-        }
-    }
+	$personalization = $database->dbQueryGenericSqlBind($query, array(':product_id' => $product_id));
 
     if(!empty($personalization)) {
-        $response['data'] = $personalization;
+        $response = $personalization[0];
     } else {
         $response['success'] = false;
         $response['error'] = 'Personalization not found for product ID ' . $product_id;

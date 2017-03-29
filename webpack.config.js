@@ -1,5 +1,5 @@
 module.exports = {
-	entry: './js/personalization.dev.js',
+	entry: __dirname + '/js/personalization.dev.js',
 	output: {
 		path: __dirname + '/js',
 		filename: 'personalization.js'
