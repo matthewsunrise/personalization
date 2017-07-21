@@ -1,0 +1,5 @@
+{
+  "maxErrors": Infinity,
+  "requireCamelCaseOrUpperCaseIdentifiers":false,
+  "requireTrailingComma": false
+}

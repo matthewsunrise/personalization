@@ -4,7 +4,9 @@
   "description": "Personalization for Teelaunch App",
   "main": "js/personalization.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "node node_modules/webpack/bin/webpack.js --hide-modules --progress --config=./webpack.config.js",
+    "prod": "node node_modules/webpack/bin/webpack.js --optimize-minimize --hide-modules --progress --config=./webpack.config.js",
+    "watch": "node node_modules/webpack/bin/webpack.js --watch --hide-modules --progress --config=./webpack.config.js"
   },
   "author": "",
   "license": "ISC",
@@ -13,7 +15,13 @@
     "babel-core": "^6.24.0",
     "babel-loader": "^6.4.1",
     "babel-preset-es2015": "^6.24.0",
+    "bulma": "^0.4.3",
     "jquery": "^3.2.1",
+    "node-sass": "^4.5.3",
+    "sass-loader": "^6.0.6",
     "webpack": "^2.3.2"
+  },
+  "devDependencies": {
+    "prettier": "^1.5.3"
   }
 }

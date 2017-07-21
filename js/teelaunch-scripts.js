@@ -6,9 +6,9 @@
 /******/ 	function __webpack_require__(moduleId) {
 /******/
 /******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId])
+/******/ 		if(installedModules[moduleId]) {
 /******/ 			return installedModules[moduleId].exports;
-/******/
+/******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 27);
+/******/ 	return __webpack_require__(__webpack_require__.s = 28);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -380,7 +380,7 @@ module.exports = {
 /* WEBPACK VAR INJECTION */(function(process) {
 
 var utils = __webpack_require__(0);
-var normalizeHeaderName = __webpack_require__(24);
+var normalizeHeaderName = __webpack_require__(25);
 
 var PROTECTION_PREFIX = /^\)\]\}',?\n/;
 var DEFAULT_CONTENT_TYPE = {
@@ -477,7 +477,7 @@ module.exports = defaults;
 /* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(10);
+module.exports = __webpack_require__(11);
 
 /***/ }),
 /* 3 */
@@ -487,12 +487,12 @@ module.exports = __webpack_require__(10);
 /* WEBPACK VAR INJECTION */(function(process) {
 
 var utils = __webpack_require__(0);
-var settle = __webpack_require__(16);
-var buildURL = __webpack_require__(19);
-var parseHeaders = __webpack_require__(25);
-var isURLSameOrigin = __webpack_require__(23);
+var settle = __webpack_require__(17);
+var buildURL = __webpack_require__(20);
+var parseHeaders = __webpack_require__(26);
+var isURLSameOrigin = __webpack_require__(24);
 var createError = __webpack_require__(6);
-var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(18);
+var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(19);
 
 module.exports = function xhrAdapter(config) {
   return new Promise(function dispatchXhrRequest(resolve, reject) {
@@ -588,7 +588,7 @@ module.exports = function xhrAdapter(config) {
     // This is only done if running in a standard browser environment.
     // Specifically not if we're in a web worker, or react-native.
     if (utils.isStandardBrowserEnv()) {
-      var cookies = __webpack_require__(21);
+      var cookies = __webpack_require__(22);
 
       // Add xsrf header
       var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
@@ -709,7 +709,7 @@ module.exports = function isCancel(value) {
 "use strict";
 
 
-var enhanceError = __webpack_require__(15);
+var enhanceError = __webpack_require__(16);
 
 /**
  * Create an Error with the specified message, config, error code, and response.
@@ -918,6 +918,10 @@ process.off = noop;
 process.removeListener = noop;
 process.removeAllListeners = noop;
 process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
 
 process.binding = function (name) {
     throw new Error('process.binding is not supported');
@@ -972,16 +976,26 @@ var Personalization = function () {
   }
 
   _createClass(Personalization, [{
-    key: 'init',
+    key: 'inject',
     value: function inject() {
 
       var first = this.details[Object.keys(this.details)[0]];
       this.font = first.fontGooleUrlVar;
 
-      $('head').append('<link href="' + SR_REMOTE_URL + '/remote/css/modal.css" rel="stylesheet">');
+      if ($('#SR_modal_css').length === 0) {
+        $('head').append('<link href="' + SR_REMOTE_URL + '/remote/css/modal.css" rel="stylesheet" id="SR_modal_css">');
+      }
+
       $('head').append('<link href="' + GOOGLE_FONT_URL + this.font + '" rel="stylesheet">');
-      $('body').append(modalTemplate);
-      $('body').append(toastTemplate);
+
+      if ($('#teelaunch_modals').length === 0) {
+        modalTemplate = '<div id="teelaunch_modals">' + modalTemplate + '</div>';
+        $('body').append(modalTemplate);
+        $('#teelaunch_modals').append(toastTemplate);
+      } else {
+        $('#teelaunch_modals').append(modalTemplate);
+        $('#teelaunch_modals').append(toastTemplate);
+      }
 
       var $addToCart = $('[name=add]');
       var $parent = $addToCart.parent();
@@ -991,14 +1005,14 @@ var Personalization = function () {
 
       var buttonTemplate = $addToCart.outerHTML();
 
-      buttonTemplate = buttonTemplate.replace(/(addToCart|AddToCart)(.*)(?=\")/, 'personalizeProduct');
+      buttonTemplate = buttonTemplate.replace(/(addToCart|AddToCart[^\"$]*)/, 'personalizeProduct');
       buttonTemplate = buttonTemplate.replace('name="add"', 'name="personalize"');
       buttonTemplate = buttonTemplate.replace('value="Add to Cart"', 'value="Personalize"');
       buttonTemplate = buttonTemplate.replace(/Add to Cart/i, 'Personalize');
 
       $addToCart.after(buttonTemplate);
 
-      $('[name=personalize').attr('id', 'personalizeProduct');
+      $('[name=personalize]').attr('id', 'personalizeProduct');
 
       $('#personalizeProduct').css({
         color: button_color,
@@ -1144,9 +1158,172 @@ String.prototype.lcwords = function () {
 "use strict";
 
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var SR_REMOTE_URL = 'https://apps.sunriseintegration.com/a/teelaunch';
+
+var modalTemplate = '\n<div class="modal" id="sunrise_integration_sizing_modal">\n  <div class="modal-background"></div>\n  <div class="modal-card">\n    <header class="modal-card-head">\n      <p class="modal-card-title">Sizing Chart<small class="sunrise_variant_title"></small></p>\n      <button class="delete"></button>\n    </header>\n    <section class="modal-card-body" id="sizingApp">\n    <div class="box">\n    <div class="columns">\n    <div class="column">\n        <span>Please select:</span>\n    </div>\n    <div class="column">\n        <p class="control">\n    <span class="select">\n      <select name="sizingProducts" id="sizingProduct">\n    <option value="">Select Product</option>\n    </select>\n    </span>\n</p>\n    </div>\n    <div class="column">\n        <p class="control">\n    <span class="select">\n    <select name="sizingUnit" id="sizingUnit">\n    <option value="">Select Unit</option>\n    </select>\n</span>\n</p>\n    </div>\n    </div>\n    </div>\n      <div class="box">\n      <div class="columns">\n      <div class="column">\n      <table class="table is-bordered">\n      <thead id="sizingHeaders">\n      </thead>\n      <tbody id="sizingRows">\n      </tbody>\n      </table>\n</div>\n<div class="column">\n   <figure class="image" id="sizingImage">\n          <img src="">\n        </figure>\n</div>\n</div>\n      </div>\n    </section>\n    <footer class="modal-card-foot">\n    </footer>\n  </div>\n</div>\n';
+
+var Sizing = function () {
+  function Sizing(options) {
+    _classCallCheck(this, Sizing);
+
+    this.options = options;
+
+    this.unit = {
+      abbreviation: '',
+      name: ''
+    };
+
+    this.init();
+  }
+
+  _createClass(Sizing, [{
+    key: 'init',
+    value: function init() {
+      var first = this.options[Object.keys(this.options)[0]];
+
+      this.setUnit(first.units[0]);
+
+      if ($('#SR_modal_css').length === 0) {
+        $('head').append('<link href="' + SR_REMOTE_URL + '/remote/css/modal.css" rel="stylesheet" id="SR_modal_css">');
+      }
+
+      if ($('#teelaunch_modals').length === 0) {
+        modalTemplate = '<div id="teelaunch_modals">' + modalTemplate + '</div>';
+        $('body').append(modalTemplate);
+      } else {
+        $('#teelaunch_modals').append(modalTemplate);
+      }
+
+      this.setActiveProduct(first.productSKU);
+      this.setSizingImage();
+
+      this.renderHeaders();
+      this.renderRows();
+
+      this.renderProductSelections();
+      this.renderProductUnits(first.units);
+
+      var $addToCart = $('[name=add]');
+      var buttonTemplate = $addToCart.outerHTML();
+
+      buttonTemplate = buttonTemplate.replace(/(id="([^"]*)")/, 'id="sizingChart"');
+      buttonTemplate = buttonTemplate.replace(/(name="([^"]*)")/, 'name="sizingChart"');
+      buttonTemplate = buttonTemplate.replace(/(value="([^"]*)")/, 'value="Sizing Chart"');
+      buttonTemplate = buttonTemplate.replace(/Add to Cart/i, 'Sizing Chart');
+
+      $addToCart.after(buttonTemplate);
+    }
+  }, {
+    key: 'openModal',
+    value: function openModal(sku) {}
+  }, {
+    key: 'renderHeaders',
+    value: function renderHeaders() {
+      var markup = ['<tr>', '<th>' + this.activeProduct.sizeLabel + '</th>', '<th>' + this.activeProduct.column1Header + '</th>'];
+      if (this.activeProduct.column2Header) {
+        markup.push('<th>' + this.activeProduct.column2Header + '</th>');
+      }
+      if (this.activeProduct.column3Header) {
+        markup.push('<th>' + this.activeProduct.column3Header + '</th>');
+      }
+      markup.push('</tr>');
+      $('#sizingHeaders').html(markup.join());
+    }
+  }, {
+    key: 'renderRows',
+    value: function renderRows() {
+      var _this = this;
+
+      var markup = [];
+
+      this.activeProduct.rows.forEach(function (row, i) {
+        if (row.unit_id == _this.unit.id) {
+          var html = '<tr>\n        <td>' + row.sizeName + '</td>\n        <td>' + row.column1Value + '</td>\n      ';
+
+          if (row.column2Value !== null) {
+            html += '<td>' + row.column2Value + '</td>';
+          }
+          if (row.column3Value !== null) {
+            html += '<td>' + row.column3Value + '</td>';
+          }
+          html += '</tr>';
+          markup.push(html);
+        }
+      });
+      $('#sizingRows').html(markup.join());
+    }
+  }, {
+    key: 'renderProductSelections',
+    value: function renderProductSelections() {
+      var markup = [];
+      for (var prop in this.options) {
+        var option = '<option value="' + prop + '">' + this.options[prop].title + '</option>';
+        markup.push(option);
+      }
+      $('#sizingProduct').html(markup.join());
+    }
+  }, {
+    key: 'renderProductUnits',
+    value: function renderProductUnits(units) {
+      var markup = [];
+      units.forEach(function (unit, i) {
+        var option = '<option value="' + i + '">' + unit.name + '</option>';
+        markup.push(option);
+      });
+      $('#sizingUnit').html(markup.join());
+    }
+  }, {
+    key: 'setActiveProduct',
+    value: function setActiveProduct(sku) {
+      this.activeProduct = this.options[sku];
+      this.setUnit(this.activeProduct.units[0]);
+      this.renderProductUnits(this.activeProduct.units);
+
+      console.log(this.activeProduct);
+    }
+  }, {
+    key: 'setSizingImage',
+    value: function setSizingImage() {
+      console.log(this.activeProduct.imageUrl);
+      $('#sizingImage img').attr('src', this.activeProduct.imageUrl);
+    }
+  }, {
+    key: 'setUnit',
+    value: function setUnit(_ref) {
+      var abbreviation = _ref.abbreviation,
+          name = _ref.name,
+          id = _ref.id;
+
+      console.log(id);
+      this.unit.abbreviation = abbreviation;
+      this.unit.name = name;
+      this.unit.id = id;
+    }
+  }]);
+
+  return Sizing;
+}();
+
+exports.default = Sizing;
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 var utils = __webpack_require__(0);
 var bind = __webpack_require__(7);
-var Axios = __webpack_require__(12);
+var Axios = __webpack_require__(13);
 var defaults = __webpack_require__(1);
 
 /**
@@ -1181,14 +1358,14 @@ axios.create = function create(instanceConfig) {
 
 // Expose Cancel & CancelToken
 axios.Cancel = __webpack_require__(4);
-axios.CancelToken = __webpack_require__(11);
+axios.CancelToken = __webpack_require__(12);
 axios.isCancel = __webpack_require__(5);
 
 // Expose all/spread
 axios.all = function all(promises) {
   return Promise.all(promises);
 };
-axios.spread = __webpack_require__(26);
+axios.spread = __webpack_require__(27);
 
 module.exports = axios;
 
@@ -1197,7 +1374,7 @@ module.exports.default = axios;
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1261,7 +1438,7 @@ module.exports = CancelToken;
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1269,10 +1446,10 @@ module.exports = CancelToken;
 
 var defaults = __webpack_require__(1);
 var utils = __webpack_require__(0);
-var InterceptorManager = __webpack_require__(13);
-var dispatchRequest = __webpack_require__(14);
-var isAbsoluteURL = __webpack_require__(22);
-var combineURLs = __webpack_require__(20);
+var InterceptorManager = __webpack_require__(14);
+var dispatchRequest = __webpack_require__(15);
+var isAbsoluteURL = __webpack_require__(23);
+var combineURLs = __webpack_require__(21);
 
 /**
  * Create a new instance of Axios
@@ -1353,7 +1530,7 @@ module.exports = Axios;
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1412,14 +1589,14 @@ module.exports = InterceptorManager;
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var utils = __webpack_require__(0);
-var transformData = __webpack_require__(17);
+var transformData = __webpack_require__(18);
 var isCancel = __webpack_require__(5);
 var defaults = __webpack_require__(1);
 
@@ -1498,7 +1675,7 @@ module.exports = function dispatchRequest(config) {
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1524,7 +1701,7 @@ module.exports = function enhanceError(error, config, code, response) {
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1556,7 +1733,7 @@ module.exports = function settle(resolve, reject, response) {
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1583,7 +1760,7 @@ module.exports = function transformData(data, headers, fns) {
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1626,7 +1803,7 @@ module.exports = btoa;
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1701,7 +1878,7 @@ module.exports = function buildURL(url, params, paramsSerializer) {
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1720,7 +1897,7 @@ module.exports = function combineURLs(baseURL, relativeURL) {
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1780,7 +1957,7 @@ module.exports = (
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1801,7 +1978,7 @@ module.exports = function isAbsoluteURL(url) {
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1876,7 +2053,7 @@ module.exports = (
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1895,7 +2072,7 @@ module.exports = function normalizeHeaderName(headers, normalizedName) {
 
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1939,7 +2116,7 @@ module.exports = function parseHeaders(headers) {
 
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1973,7 +2150,7 @@ module.exports = function spread(callback) {
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1987,15 +2164,19 @@ var _Personalization = __webpack_require__(9);
 
 var _Personalization2 = _interopRequireDefault(_Personalization);
 
+var _Sizing = __webpack_require__(10);
+
+var _Sizing2 = _interopRequireDefault(_Sizing);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var bulma_url = 'https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.0/css/bulma.min.css';
 var sr_remote_url = 'https://apps.sunriseintegration.com/a/teelaunch';
 
 var Personalizer = void 0;
+var SizingChart = void 0;
 
 (function ($) {
-
   console.log(meta);
 
   if (typeof __st.p !== 'undefined' && __st.p === 'product' && __st.rid > 0 && meta.product.vendor === 'teelaunch') {
@@ -2003,28 +2184,73 @@ var Personalizer = void 0;
     shop_url = shop_url.substr(0, shop_url.indexOf('/'));
 
     var $modal = $('#sunrise_integration_modal');
-    var SKU = meta.product.variants[0].sku;
+    var skus = [];
+
+    if (meta.product.variants.length > 0) {
+      meta.product.variants.forEach(function (cur) {
+        if (skus.indexOf(cur.sku) === -1) {
+          skus.push(cur.sku);
+        }
+      });
+    }
+
     if ($modal.length === 0) {
-      var personalization_check = _axios2.default.get(sr_remote_url + '/remote/ajax.php', {
+      var product_check = _axios2.default.get(sr_remote_url + '/remote/ajax.php', {
         params: {
           action: 'getProduct',
           product_id: __st.rid,
           shop: shop_url,
-          sku: SKU
+          sku: skus
         }
       });
 
-      personalization_check.then(function (response) {
+      product_check.then(function (response) {
+        console.log(response.data);
 
-        if (response.status === 200 && response.data.success !== false) {
-          Personalizer = new _Personalization2.default(response.data);
+        if (response.status === 200) {
+          if (typeof response.data.sizing !== 'undefined') {
+            console.log(response.data.sizing);
+            SizingChart = new _Sizing2.default(response.data.sizing);
+          }
+
+          if (typeof response.data.personalization !== 'undefined') {
+            Personalizer = new _Personalization2.default(response.data.personalization);
+          }
         }
       });
     }
   }
 
-  $(document).ready(function (e) {
+  $(function () {
+    // sizing event listeners
 
+    $(document).on('change', '#sizingProduct', function (e) {
+      SizingChart.setActiveProduct(e.target.value);
+      SizingChart.setSizingImage();
+      SizingChart.renderHeaders();
+      SizingChart.renderRows();
+    });
+
+    $(document).on('change', '#sizingUnit', function (e) {
+      SizingChart.setUnit(SizingChart.activeProduct.units[e.target.value]);
+      SizingChart.renderHeaders();
+      SizingChart.renderRows();
+    });
+
+    $(document).on('click', '#sizingChart', function (e) {
+      e.preventDefault();
+
+      var variant_id = $('[name=id]').val();
+      var sku = meta.product.variants.find(function (variant) {
+        return variant.id == variant_id;
+      }).sku;
+
+      if (typeof SizingChart !== 'undefined') SizingChart.openModal(sku);
+
+      $('#sunrise_integration_sizing_modal').addClass('is-active');
+    });
+
+    // personalization event listeners
     $(document).on('click', '#personalizeProduct', function (e) {
       e.preventDefault();
 
@@ -2036,7 +2262,6 @@ var Personalizer = void 0;
     });
 
     $(document).on('change paste keyup', '#personalizationText', function (e) {
-
       var personalized_text = encodeURIComponent($(this).val()).replace(/'/g, '%27').replace(/\(/, '%28').replace(/\)/, '%29').replace(/</g, '%3C').replace(/>/g, '%3E');
       var color = encodeURIComponent($('#personalizationColor').val());
       var variant_id = encodeURIComponent($('[name=id]').val());
@@ -2056,13 +2281,14 @@ var Personalizer = void 0;
 
       var dynamic_img_url = sr_remote_url + '/images/font-preview-img.php?size=100&text=' + personalized_text + '&color=' + color + '&font=' + font;
 
-      $('#textZoneImg').css({ 'background-image': 'url(' + dynamic_img_url + ')' });
+      $('#textZoneImg').css({
+        'background-image': 'url(' + dynamic_img_url + ')'
+      });
 
       _Personalization2.default.resizeText();
     });
 
     $(document).on('change', '#personalizationColor', function (e) {
-
       var personalized_text = encodeURI($('#personalizationText').val());
       var color = $(this).val();
       var variant_id = $('[name=id]').val();
@@ -2074,14 +2300,17 @@ var Personalizer = void 0;
 
       var dynamic_img_url = sr_remote_url + '/images/font-preview-img.php?size=100&text=' + personalized_text + '&color=' + color + '&font=' + font;
 
-      $('#textZoneImg').css({ 'background-image': 'url(' + dynamic_img_url + ')' });
+      $('#textZoneImg').css({
+        'background-image': 'url(' + dynamic_img_url + ')'
+      });
+      $('#personalizationText').trigger('change');
       $('#textZone').css('color', $(this).val());
     });
 
     $(document).on('click', '.button.button-cancel', function (e) {
       e.preventDefault();
 
-      $('#sunrise_integration_modal').removeClass('is-active');
+      $(this).parent().parent().parent().removeClass('is-active');
     });
 
     $(document).on('click', '.button.button-add-to-cart', function (e) {
@@ -2094,22 +2323,21 @@ var Personalizer = void 0;
     $(document).on('click', 'button.delete', function (e) {
       e.preventDefault();
 
-      $('#sunrise_integration_modal').removeClass('is-active');
-      $('#sunrise_integration_toast').removeClass('is-active');
+      $(this).parent().parent().parent().removeClass('is-active');
     });
 
     $(document).on('change', 'select,input', function (e) {
-      if ($("#addToCart").prop('disabled')) {
-        $("#personalizeProduct").prop('disabled', true).text('Unavailable').val('Unavailable');
+      if ($('#addToCart').prop('disabled')) {
+        $('#personalizeProduct').prop('disabled', true).text('Unavailable').val('Unavailable');
       } else {
-        $("#personalizeProduct").prop('disabled', false).text('Personalize').val('Personalize');
+        $('#personalizeProduct').prop('disabled', false).text('Personalize').val('Personalize');
       }
     });
   });
 
   // extend jQuery to allow for grabbing the outer html of an element
   $.fn.outerHTML = function (s) {
-    return s ? this.before(s).remove() : $("<p>").append(this.eq(0).clone()).html();
+    return s ? this.before(s).remove() : $('<p>').append(this.eq(0).clone()).html();
   };
 })(jQuery);
 

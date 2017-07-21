@@ -1,0 +1,119 @@
+#teelaunch_modals {
+  @import '../../node_modules/bulma/bulma';
+
+  #sunrise_integration_modal,
+  #sunrise_integration_toast,
+  #sunrise_integration_sizing_modal {
+    &.modal {
+      bottom: 0;
+      left: 0;
+      position: absolute;
+      right: 0;
+      top: 0;
+      -webkit-box-align: center;
+      -ms-flex-align: center;
+      align-items: center;
+      display: none;
+      -webkit-box-pack: center;
+      -ms-flex-pack: center;
+      justify-content: center;
+      overflow: hidden;
+      position: fixed;
+      z-index: 1986;
+
+      &.is-active {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        opacity:1;
+        visibility : visible;
+      }
+
+      & .modal-card {
+        width:820px;
+      }
+
+      #personalizationApp {
+        & .box {
+          display: flex;
+          justify-content :center;
+
+          & .image {
+            position: relative;
+            display: flex;
+            justify-content :center;
+            width: 350px;
+            height: 350px;
+
+            & .text-zone {
+              background-color:transparent;
+              position:absolute;
+              width:10px;
+              height:10px;
+              left:0;
+              top:0;
+              border:1px dashed #ccc;
+              overflow:hidden;
+              white-space: nowrap;
+              color:#fff;
+
+              & #innerTextZone {
+                position: relative;
+
+                & span {
+                  position : absolute;
+                  text-align: center;
+                  min-width: 99%;
+                }
+
+                & #textZoneImg {
+                  background-size: contain;
+                  background-repeat:no-repeat;
+                  background-position : center center;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      #sizingApp {
+        & .box {
+          display: flex;
+          flex-direction: row;
+          justify-content :space-between;
+
+          & select {
+            background-image:none!important;
+            width:auto!important;
+          }
+
+          & figure {
+            & img {
+              width: 100%;
+              height: 100%;
+            }
+          }
+        }
+      }
+
+      @media all and (max-width: 767px) {
+        & .box {
+          flex-direction :column;
+
+          & table {
+            flex-basis: 100%;
+          }
+
+          & figure {
+            flex-basis: 100%;
+            margin-top:1em;
+          }
+        }
+      }
+    }
+  }
+
+
+}
+
